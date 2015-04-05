@@ -1,12 +1,9 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Ebola
- * Date: 4/6/15
- * Time: 8:53 PM
+ * @author Eremin Ivan
+ * @email coding.ebola@gmail.com
  */
-
-namespace App\Api\Search;
+namespace App\Api\Search\Parser;
 
 
 class Source
@@ -14,6 +11,8 @@ class Source
     public $type;
     public $uri;
     public $keywords;
+
+    public $limit = 10;
 
     public function __construct($type, $uri, array $keywords)
     {

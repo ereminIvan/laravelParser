@@ -1,11 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Ebola
- * Date: 4/6/15
- * Time: 9:00 PM
+ * @author Eremin Ivan
+ * @email coding.ebola@gmail.com
  */
-
 namespace App\Api\Search;
 
 

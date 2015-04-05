@@ -25,8 +25,10 @@ class SocialParserController extends AdminController
 
     public function addSource()
     {
-        $source = new \App\Api\Search\Source('facebook', '/fczenit/feed?fields=id,message,picture&limit=250', ['one','two']);
-        $parser = \App\Api\Search\ParserFactory::factory($source)->parse();
+        $source = new \App\Api\Search\Parser\Source('facebook', '/fczenit/feed?fields=id,message,picture&limit=250', ['метро']);
+        $result = \App\Api\Search\ParserFactory::factory($source)->parse();
+        var_dump($result);
+        die;
         return view('admin.sections.social-parser.add');
     }
 }

@@ -52,6 +52,11 @@ class FacebookAPI
         return self::$session = FacebookSession::newAppSession(self::FACEBOOK_APP_ID, self::FACEBOOK_APP_SECRET);
     }
 
+    /**
+     * @param string $method
+     * @param $uri
+     * @return \Facebook\GraphObject
+     */
     public static function execute($method = 'GET', $uri)
     {
         try {
