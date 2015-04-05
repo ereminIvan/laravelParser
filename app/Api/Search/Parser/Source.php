@@ -11,13 +11,13 @@ class Source
     public $type;
     public $uri;
     public $keywords;
+    public $requestLimit;
 
-    public $limit = 10;
-
-    public function __construct($type, $uri, array $keywords)
+    public function __construct($type, $uri, array $keywords, $requestLimit = null)
     {
         $this->type = $type;
         $this->uri = $uri;
         $this->keywords = $keywords;
+        $this->requestLimit = $requestLimit;
     }
 }

@@ -23,23 +23,44 @@ class FacebookParser extends Parser implements ParserInterface
 
         /** @var $item GraphObject */
         foreach ($graph->getPropertyAsArray('data') as $item) {
-            if ($text = $item->getProperty('message')) {
-                foreach (preg_split("/\s/", $text) as $keyword) {
-                    if (isset($keywords[$keyword])) {
-                        $result[] = $item->asArray();
-                        continue 2;
-                    }
-                }
+            if($this->test($item, $keywords)) {
+                $result[] = $this->normalize($item);
             }
-            continue;
         }
+//If we need to get other results from paginated set this part should to implemented
 //        $paging = $graph->getPropertyAsArray('paging');
-//        if($this->source->limit > count($paging)) {
+//        if($this->source->requestLimit > count($paging)) {
 //            /** @var $p \Facebook\GraphObject */
 //            foreach ($paging as $p) {
 //                $p->asArray();
 //            }
 //        }
         return $result;
+    }
+
+    /**
+     * @param GraphObject   $item
+     * @param array         $keywords
+     * @return bool
+     */
+    public function test($item, $keywords)
+    {
+        if ($text = $item->getProperty('message')) {
+            foreach (preg_split("/\s/", $text) as $keyword) {
+                if (isset($keywords[$keyword])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param GraphObject $item
+     * @return array
+     */
+    public function normalize($item)
+    {
+        return $item->asArray();
     }
 }
