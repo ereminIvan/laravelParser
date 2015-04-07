@@ -9,13 +9,21 @@ use \App\Api\TwitterAPI;
 
 class TwitterParser extends Parser implements ParserInterface
 {
+    public function extractScreenName($url)
+    {
+        preg_match("|https?://(www\.)?twitter\.com/(#!/)?@?([^/]*)|", $url, $matches);
+        return !empty($matches[3]) ? $matches[3] : '';
+    }
+
     public function parse()
     {
         $bird = TwitterAPI::getCodeBird();
         $bird->setToken(TwitterAPI::ACCESS_TOKEN, TwitterAPI::ACCESS_SECRET);
 
+        $screenName = /*$this->extractScreenName($this->source->uri) ? :*/ $this->source->uri;
+
         $twits = $bird->statuses_userTimeline([
-            'screen_name'       => $this->source->uri,
+            'screen_name'       => $screenName,
             'exclude_replies'   => 'true',
             'include_rts'       => 'false',
             'count'             => $this->source->requestLimit,
