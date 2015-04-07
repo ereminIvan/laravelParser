@@ -11,18 +11,42 @@ class TwitterParser extends Parser implements ParserInterface
 {
     public function parse()
     {
-        var_dump(TwitterAPI::getCodeBird());
-        // TODO: Implement parse() method.
+        $bird = TwitterAPI::getCodeBird();
+        $bird->setToken(TwitterAPI::ACCESS_TOKEN, TwitterAPI::ACCESS_SECRET);
+
+        $twits = $bird->statuses_userTimeline([
+            'screen_name'       => $this->source->uri,
+            'exclude_replies'   => 'true',
+            'include_rts'       => 'false',
+            'count'             => $this->source->requestLimit,
+        ]);
+
+        $result = [];
+        $keywords = array_flip($this->source->keywords);
+        /** @var \StdClass $twit */
+        foreach ($twits as $twit) {
+            if ($this->test($twit, $keywords)) {
+               $result[] = $this->normalize($twit);
+            }
+        }
+        return $result;
     }
 
     /**
-     * @param $item
-     * @param $keywords
+     * @param \StdClass $item
+     * @param array     $keywords
      * @return bool
      */
     public function test($item, $keywords)
     {
-        // TODO: Implement test() method.
+        if ($text = $item->text) {
+            foreach (preg_split("/\s/", $text) as $keyword) {
+                if (isset($keywords[$keyword])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -31,6 +55,14 @@ class TwitterParser extends Parser implements ParserInterface
      */
     public function normalize($item)
     {
-        // TODO: Implement normalize() method.
+        return [
+            'id'            => $item->id,
+            'created_at'    => $item->created_at,
+            'text'          => $item->text,
+            'user'          => [
+                'id' => $item->user->id,
+                'name' => $item->user->name
+            ],
+        ];
     }
 }
