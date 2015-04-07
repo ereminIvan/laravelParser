@@ -6,6 +6,7 @@
 namespace App\Api\Search;
 
 use \App\Api\TwitterAPI;
+use PhpSpec\Exception\Exception;
 
 class TwitterParser extends Parser implements ParserInterface
 {
@@ -20,20 +21,21 @@ class TwitterParser extends Parser implements ParserInterface
         $bird = TwitterAPI::getCodeBird();
         $bird->setToken(TwitterAPI::ACCESS_TOKEN, TwitterAPI::ACCESS_SECRET);
 
-        $screenName = /*$this->extractScreenName($this->source->uri) ? :*/ $this->source->uri;
+        $screenName = $this->extractScreenName($this->source->uri) ? : $this->source->uri;
 
         $twits = $bird->statuses_userTimeline([
             'screen_name'       => $screenName,
             'exclude_replies'   => 'true',
             'include_rts'       => 'false',
-            'count'             => $this->source->requestLimit,
+            'count'             => (int) $this->source->requestLimit,
         ]);
 
         $result = [];
         $keywords = array_flip($this->source->keywords);
+
         /** @var \StdClass $twit */
         foreach ($twits as $twit) {
-            if ($this->test($twit, $keywords)) {
+            if ($twit instanceof \StdClass && $this->test($twit, $keywords)) {
                $result[] = $this->normalize($twit);
             }
         }
@@ -47,6 +49,9 @@ class TwitterParser extends Parser implements ParserInterface
      */
     public function test($item, $keywords)
     {
+        if (!property_exists($item, 'text')) {
+            return false;
+        }
         if ($text = $item->text) {
             foreach (preg_split("/\s/", $text) as $keyword) {
                 if (isset($keywords[$keyword])) {
@@ -64,12 +69,14 @@ class TwitterParser extends Parser implements ParserInterface
     public function normalize($item)
     {
         return [
-            'id'            => $item->id,
-            'created_at'    => $item->created_at,
-            'text'          => $item->text,
+            'id'            => (string) $item->id_str,
+            'created_at'    => (string) $item->created_at,
+            'title'         => null,
+            'text'          => (string) $item->text,
+            'link'          => (string) $item->id_str,
             'user'          => [
-                'id' => $item->user->id,
-                'name' => $item->user->name
+                'id'    => (string) $item->user->id,
+                'name'  => (string) $item->user->name
             ],
         ];
     }

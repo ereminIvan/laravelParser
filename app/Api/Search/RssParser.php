@@ -49,11 +49,18 @@ class RssParser extends Parser implements ParserInterface
     }
 
     /**
-     * @param $item
+     * @param \SimpleXMLElement $item
      * @return array
      */
     public function normalize($item)
     {
-        return (array) $item;
+        return [
+            'id'            => (string) $item->guid,
+            'created_at'    => (string) $item->pubDate,
+            'title'         => (string) $item->title,
+            'text'          => (string) $item->description,
+            'link'          => (string) $item->link,
+            'user'          => ['id' => null, 'name' => null,],
+        ];
     }
 }

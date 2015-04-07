@@ -27,14 +27,13 @@ class SocialParserController extends AdminController
     {
         $result = [];
 //        Facebook Sample
-//        $source = new \App\Api\Search\Parser\Source('facebook', '/fczenit/feed?fields=id,message,picture&limit=250', ['метро']);
+        $source = new \App\Api\Search\Parser\Source('facebook', '/fczenit/feed?limit=10', ['метро']);
 //        RSS Sample
 //        $source = new \App\Api\Search\Parser\Source('rss', 'http://ria.ru/export/rss2/world/index.xml', ['НБУ', 'России'], 100);
 //        Twitter Sample
-        $source = new \App\Api\Search\Parser\Source('twitter', '', ['финансистов', 'украинской']);
+//        $source = new \App\Api\Search\Parser\Source('twitter', 'https://twitter.com/KremlinRussia', ['Путин',]);
         $result = \App\Api\Search\ParserFactory::factory($source)->parse();
-        print_r($result);
-        die;
+        echo "<pre>";print_r($result);die;
         return view('admin.sections.social-parser.add');
     }
 }

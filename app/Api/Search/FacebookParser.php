@@ -61,6 +61,16 @@ class FacebookParser extends Parser implements ParserInterface
      */
     public function normalize($item)
     {
-        return $item->asArray();
+        return [
+            'id'            => (string) $item->getProperty('id'),
+            'created_at'    => (string) $item->getProperty('created_time'), //or updated_time?
+            'title'         => null,
+            'text'          => (string) $item->getProperty('message'),
+            'link'          => (string) $item->getProperty('link'),
+            'user'          => [
+                'id'    => (string) $item->getProperty('from')->getProperty('id'),
+                'name'  => (string)$item->getProperty('from')->getProperty('name')
+            ],
+        ];
     }
 }
