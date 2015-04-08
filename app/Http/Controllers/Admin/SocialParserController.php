@@ -1,20 +1,13 @@
 <?php
-
+/**
+ * @author Eremin Ivan
+ * @email coding.ebola@gmail.com
+ */
 namespace App\Http\Controllers\Admin;
 
-use App;
-use App\Api\FacebookAPI;
-use Facebook\FacebookRedirectLoginHelper;
-use Facebook\FacebookSession;
-use Facebook\FacebookRequest;
-use Facebook\FacebookResponse;
-use Facebook\FacebookSDKException;
-use Facebook\FacebookRequestException;
-use Facebook\FacebookAuthorizationException;
-use Facebook\GraphObject;
-use Facebook\Entities\AccessToken;
-use Facebook\HttpClients\FacebookCurlHttpClient;
-use Facebook\HttpClients\FacebookHttpable;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use App\Models\ParserSource;
 
 class SocialParserController extends AdminController
 {
@@ -23,17 +16,47 @@ class SocialParserController extends AdminController
      */
     protected $layout = 'layouts.panel';
 
-    public function addSource()
+    public function sourceAdd(Request $request)
     {
-        $result = [];
-//        Facebook Sample
-        $source = new \App\Api\Search\Parser\Source('facebook', '/fczenit/feed?limit=10', ['метро']);
-//        RSS Sample
-//        $source = new \App\Api\Search\Parser\Source('rss', 'http://ria.ru/export/rss2/world/index.xml', ['НБУ', 'России'], 100);
-//        Twitter Sample
-//        $source = new \App\Api\Search\Parser\Source('twitter', 'https://twitter.com/KremlinRussia', ['Путин',]);
-        $result = \App\Api\Search\ParserFactory::factory($source)->parse();
-        echo "<pre>";print_r($result);die;
-        return view('admin.sections.social-parser.add');
+        if($request->isMethod('POST') && $request->ajax()) {
+            $this->validate($request, [
+                'sourceId'          => 'integer',
+                'sourceType'        => 'required|in:twitter,facebook,rss',
+                'sourceUri'         => 'required',
+                'sourceKeywords'    => 'required',//|regex:/([\w\d\s\t]*);?/i',
+                'sourceActive'      => 'in:on,NULL',
+            ]);
+
+            $data = [
+                'type'      => \Input::get('sourceType'),
+                'uri'       => \Input::get('sourceUri'),
+                'keywords'  => \Input::get('sourceKeywords'),
+                'active'    => (int)(bool) \Input::get('sourceActive'),
+            ];
+
+            if($id = \Input::get('sourceId')) {
+                /** @var ParserSource $source */
+                if($source = ParserSource::find($id)) {
+                    $source->update($data);
+                };
+            } else {
+                $data['user_id'] = \Auth::user()->id;
+                $source = ParserSource::create($data);
+            }
+
+            return response()->json([
+                'success'   => true,
+                'id'        => $source->id,
+            ]);
+        }
+        return response();
+    }
+
+    /**
+     * @return \Illuminate\View\View
+     */
+    public function sourceList()
+    {
+        return view('admin.sections.social-parser.source-list', ['sources' => ParserSource::all()]);
     }
 }

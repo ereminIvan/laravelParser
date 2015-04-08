@@ -1,3 +1,12 @@
+## Getting starter
+#Facebook Sample
+$source = new \App\Api\Search\Parser\Source('facebook', '/fczenit/feed?limit=10', ['метро']);
+#RSS Sample
+$source = new \App\Api\Search\Parser\Source('rss', 'http://ria.ru/export/rss2/world/index.xml', ['НБУ', 'России'], 100);
+#Twitter Sample
+$source = new \App\Api\Search\Parser\Source('twitter', 'https://twitter.com/KremlinRussia', ['Путин',]);
+$result = \App\Api\Search\ParserFactory::factory($source)->parse();
+
 ## Laravel PHP Framework
 
 [![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
