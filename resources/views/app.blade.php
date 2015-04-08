@@ -37,7 +37,8 @@
 					<li><a href="{{ url('/') }}">Home</a></li>
 				</ul>
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url('/panel/social-parser/source/add') }}">Add source form</a></li>
+                    <li><a href="{{ url('/panel/social-parser/source') }}">Source List</a></li>
+                    <li><a href="{{ url('/panel/social-parser/news') }}">News List</a></li>
                 </ul>
 				<ul class="nav navbar-nav navbar-right">
 					@if (Auth::guest())

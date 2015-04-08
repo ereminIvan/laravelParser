@@ -20,7 +20,5 @@ Route::controllers([
 
 Route::post('/panel/social-parser/source', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@sourceAdd']);
 Route::get('/panel/social-parser/source', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@sourceList']);
-//Route::get('/panel/social-parser', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@index']);
-//Route::get('/panel/social-parser/source', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@sourceList']);
-
-//Route::get('/panel/social-parser/results', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@resultList']);
+Route::get('/panel/social-parser/news', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@newsList']);
+Route::get('/panel/social-parser/news/{id}', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@news']);

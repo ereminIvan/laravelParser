@@ -10,6 +10,9 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 
 use App\Models\ParserSource;
+use App\Models\ParserNews;
+use League\Flysystem\Exception;
+use PhpParser\Parser;
 
 class SocialParserController extends AdminController
 {
@@ -17,6 +20,14 @@ class SocialParserController extends AdminController
      * @var $layout \Illuminate\View\View
      */
     protected $layout = 'layouts.panel';
+
+    /**
+     * @return \Illuminate\View\View
+     */
+    public function sourceList()
+    {
+        return view('admin.sections.social-parser.source-list', ['sources' => ParserSource::all()]);
+    }
 
     public function sourceAdd(Request $request)
     {
@@ -57,8 +68,22 @@ class SocialParserController extends AdminController
     /**
      * @return \Illuminate\View\View
      */
-    public function sourceList()
+    public function newsList()
     {
-        return view('admin.sections.social-parser.source-list', ['sources' => ParserSource::all()]);
+        return view('admin.sections.social-parser.news-list', [
+            'news' => ParserNews::all()
+        ]);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\View\View
+     */
+    public function news(Request $request)
+    {
+        return view('admin.sections.social-parser.news', [
+            'news'  => ParserNews::find($request->get('id', null))
+        ]);
     }
 }
