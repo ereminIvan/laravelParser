@@ -19,7 +19,6 @@
                                 <th>Archived</th>
                                 <th>Dates</th>
                                 <th colspan="2">Author</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
