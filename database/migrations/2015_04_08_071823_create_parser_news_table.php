@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateParserSourcesTable extends Migration {
+class CreateParserNewsTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,16 +12,18 @@ class CreateParserSourcesTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('parser_sources', function(Blueprint $table)
+		Schema::create('parser_news', function(Blueprint $table)
 		{
             $table->engine = 'InnoDB';
 
 			$table->increments('id');
-			$table->string('type');
+            $table->string('title');
+            $table->text('description');
+            $table->text('text');
             $table->text('uri');
-            $table->text('keywords');
-            $table->tinyInteger('active', false, true);
-            $table->timestamp('executed_at');
+            $table->tinyInteger('is_viewed', false, true);
+            $table->tinyInteger('is_archived', false, true);
+            $table->timestamp('viewed_at');
             $table->timestamps();
 
             $table->integer('user_id')->unsigned();
@@ -36,7 +38,7 @@ class CreateParserSourcesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('parser_sources');
+		Schema::drop('parser_news');
 	}
 
 }

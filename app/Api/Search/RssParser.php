@@ -14,7 +14,6 @@ class RssParser extends Parser implements ParserInterface
 
         $result = [];
         $keywords = array_flip($this->source->keywords);
-
         if ((float) $source->attributes()->version == 2) {
 //Limits
 //            $items = !is_null($this->source->requestLimit)
@@ -26,7 +25,7 @@ class RssParser extends Parser implements ParserInterface
                 }
             }
         } else {
-            throw new \Exception('RssParser: Unsupported RSS version');
+            throw new \Exception("RSS Parser: Unsupported RSS version.");
         }
         return $result;
     }

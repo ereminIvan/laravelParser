@@ -5,8 +5,7 @@
  */
 namespace App\Api\Search;
 
-use \App\Api\TwitterAPI;
-use PhpSpec\Exception\Exception;
+use App\Api\TwitterAPI;
 
 class TwitterParser extends Parser implements ParserInterface
 {

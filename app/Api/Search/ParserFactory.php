@@ -5,15 +5,15 @@
  */
 namespace App\Api\Search;
 
-use \App\Api\Search\Parser\Source;
+use App\Models\ParserSource;
 
 class ParserFactory
 {
     /**
-     * @param Source $source
+     * @param ParserSource $source
      * @return Parser|ParserInterface
      */
-    public static function factory(Source $source)
+    public static function factory(ParserSource $source)
     {
         return (new \ReflectionClass('\App\Api\Search\\' . ucfirst($source->type) . 'Parser'))
             ->newInstanceArgs([$source]);

@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
+
 use App\Models\ParserSource;
 
 class SocialParserController extends AdminController
@@ -28,13 +30,13 @@ class SocialParserController extends AdminController
             ]);
 
             $data = [
-                'type'      => \Input::get('sourceType'),
-                'uri'       => \Input::get('sourceUri'),
-                'keywords'  => \Input::get('sourceKeywords'),
-                'active'    => (int)(bool) \Input::get('sourceActive'),
+                'type'      => $request->input('sourceType'),
+                'uri'       => $request->input('sourceUri'),
+                'keywords'  => $request->input('sourceKeywords'),
+                'active'    => (int)(bool) $request->input('sourceActive'),
             ];
 
-            if($id = \Input::get('sourceId')) {
+            if($id = $request->input('sourceId')) {
                 /** @var ParserSource $source */
                 if($source = ParserSource::find($id)) {
                     $source->update($data);

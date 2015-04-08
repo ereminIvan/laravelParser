@@ -5,12 +5,17 @@
  */
 namespace App\Api\Search;
 
+use App\Models\ParserSource;
+
 class Parser
 {
-    /** @var \App\Api\Search\Parser\Source */
+    /** @var \App\Models\ParserSource */
     protected $source;
 
-    public function __construct(Parser\Source $source)
+    /**
+     * @param \App\Models\ParserSource $source
+     */
+    public function __construct(ParserSource $source)
     {
         $this->source = $source;
     }

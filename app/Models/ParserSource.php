@@ -3,7 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 /**
- * Class EmailLead
+ * Class ParserSource
  *
  * @property          $id
  *
@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 class ParserSource extends Model
 {
     protected $table = 'parser_sources';
-    protected $fillable = ['source', 'active', 'user_id', 'uri', 'keywords', 'executed_at', 'type'];
+    protected $fillable = ['source', 'active', 'user_id', 'uri', 'keywords', 'type'];
     protected $guarded = ['id'];
 
     public function user()
