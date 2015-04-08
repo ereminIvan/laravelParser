@@ -17,17 +17,16 @@ class CreateParserNewsTable extends Migration {
             $table->engine = 'InnoDB';
 
 			$table->increments('id');
-            $table->string('title');
-            $table->text('description');
-            $table->text('text');
+            $table->string('title')->default('');
+            $table->text('description')->default('');
+            $table->text('text')->default('');
             $table->text('uri');
-            $table->tinyInteger('is_viewed', false, true);
-            $table->tinyInteger('is_archived', false, true);
-            $table->timestamp('viewed_at');
+            $table->tinyInteger('is_viewed', false, true)->default(0);
+            $table->tinyInteger('is_archived', false, true)->default(0);
+            $table->timestamp('viewed_at')->default(null);
             $table->timestamps();
-
-            $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->integer('user_id')->unsigned()->default(null);
+//            $table->foreign('user_id')->references('id')->on('users');
 		});
 	}
 

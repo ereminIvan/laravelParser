@@ -3,7 +3,7 @@
  * @author Eremin Ivan
  * @email coding.ebola@gmail.com
  */
-namespace App\Api\Search;
+namespace App\Api\Parser;
 
 use App\Api\TwitterAPI;
 
@@ -30,7 +30,7 @@ class TwitterParser extends Parser implements ParserInterface
         ]);
 
         $result = [];
-        $keywords = array_flip($this->source->keywords);
+        $keywords = array_flip(explode(';', $this->source->keywords));
 
         /** @var \StdClass $twit */
         foreach ($twits as $twit) {
@@ -52,7 +52,7 @@ class TwitterParser extends Parser implements ParserInterface
             return false;
         }
         if ($text = $item->text) {
-            foreach (preg_split("/\s/", $text) as $keyword) {
+            foreach (preg_split("/\s/i", $text) as $keyword) {
                 if (isset($keywords[$keyword])) {
                     return true;
                 }
@@ -69,10 +69,11 @@ class TwitterParser extends Parser implements ParserInterface
     {
         return [
             'id'            => (string) $item->id_str,
-            'created_at'    => (string) $item->created_at,
-            'title'         => null,
+            'title'         => '',
+            'description'   => '',
             'text'          => (string) $item->text,
             'link'          => (string) $item->id_str,
+            'created_at'    => (string) $item->created_at,
             'user'          => [
                 'id'    => (string) $item->user->id,
                 'name'  => (string) $item->user->name

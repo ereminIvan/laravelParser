@@ -20,7 +20,7 @@ class CreateParserSourcesTable extends Migration {
 			$table->string('type');
             $table->text('uri');
             $table->text('keywords');
-            $table->tinyInteger('active', false, true);
+            $table->tinyInteger('is_active', false, true);
             $table->timestamp('executed_at');
             $table->timestamps();
 

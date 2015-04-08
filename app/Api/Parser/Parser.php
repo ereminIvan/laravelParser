@@ -3,7 +3,7 @@
  * @author Eremin Ivan
  * @email coding.ebola@gmail.com
  */
-namespace App\Api\Search;
+namespace App\Api\Parser;
 
 use App\Models\ParserSource;
 

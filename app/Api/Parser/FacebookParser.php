@@ -3,7 +3,7 @@
  * @author Eremin Ivan
  * @email coding.ebola@gmail.com
  */
-namespace App\Api\Search;
+namespace App\Api\Parser;
 
 use App\Api\FacebookAPI;
 use FaceBook\GraphObject;
@@ -19,7 +19,7 @@ class FacebookParser extends Parser implements ParserInterface
         $graph = FacebookAPI::execute('GET', $this->source->uri);
 
         $result = [];
-        $keywords = array_flip($this->source->keywords);
+        $keywords = array_flip(explode(';', $this->source->keywords));
 
         /** @var $item GraphObject */
         foreach ($graph->getPropertyAsArray('data') as $item) {
@@ -46,7 +46,7 @@ class FacebookParser extends Parser implements ParserInterface
     public function test($item, $keywords)
     {
         if ($text = $item->getProperty('message')) {
-            foreach (preg_split("/\s/", $text) as $keyword) {
+            foreach (preg_split("/\s/i", $text) as $keyword) {
                 if (isset($keywords[$keyword])) {
                     return true;
                 }
@@ -63,10 +63,11 @@ class FacebookParser extends Parser implements ParserInterface
     {
         return [
             'id'            => (string) $item->getProperty('id'),
-            'created_at'    => (string) $item->getProperty('created_time'), //or updated_time?
-            'title'         => null,
+            'title'         => '',
+            'description'   => '',
             'text'          => (string) $item->getProperty('message'),
             'link'          => (string) $item->getProperty('link'),
+            'created_at'    => (string) $item->getProperty('created_time'), //or updated_time?
             'user'          => [
                 'id'    => (string) $item->getProperty('from')->getProperty('id'),
                 'name'  => (string)$item->getProperty('from')->getProperty('name')

@@ -3,7 +3,7 @@
  * @author Eremin Ivan
  * @email coding.ebola@gmail.com
  */
-namespace App\Api\Search;
+namespace App\Api\Parser;
 
 use App\Models\ParserSource;
 
@@ -15,7 +15,7 @@ class ParserFactory
      */
     public static function factory(ParserSource $source)
     {
-        return (new \ReflectionClass('\App\Api\Search\\' . ucfirst($source->type) . 'Parser'))
+        return (new \ReflectionClass('\App\Api\Parser\\' . ucfirst($source->type) . 'Parser'))
             ->newInstanceArgs([$source]);
     }
 } 

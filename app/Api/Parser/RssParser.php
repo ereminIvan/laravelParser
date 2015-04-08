@@ -3,18 +3,18 @@
  * @author Eremin Ivan
  * @email coding.ebola@gmail.com
  */
-namespace App\Api\Search;
+namespace App\Api\Parser;
 
+use App\Api\RssAPI;
 
 class RssParser extends Parser implements ParserInterface
 {
     public function parse()
     {
-        $source = simplexml_load_file($this->source->uri);
-
+        $source = RssAPI::get($this->source->uri);
         $result = [];
-        $keywords = array_flip($this->source->keywords);
-        if ((float) $source->attributes()->version == 2) {
+        $keywords = array_flip(explode(';', $this->source->keywords));
+        if ($source->attributes()->version == "2.0") {
 //Limits
 //            $items = !is_null($this->source->requestLimit)
 //                ? array_slice((array) $source->channel->item, 0, $this->source->requestLimit)
@@ -25,7 +25,7 @@ class RssParser extends Parser implements ParserInterface
                 }
             }
         } else {
-            throw new \Exception("RSS Parser: Unsupported RSS version.");
+            //todo implement other versions atom|rss1|rrs2
         }
         return $result;
     }
@@ -38,7 +38,7 @@ class RssParser extends Parser implements ParserInterface
     public function test($item, $keywords)
     {
         if ($text = $item->description) {
-            foreach (preg_split("/\s/", $text) as $keyword) {
+            foreach (preg_split("/\s/i", $text) as $keyword) {
                 if (isset($keywords[$keyword])) {
                     return true;
                 }
@@ -55,11 +55,15 @@ class RssParser extends Parser implements ParserInterface
     {
         return [
             'id'            => (string) $item->guid,
-            'created_at'    => (string) $item->pubDate,
             'title'         => (string) $item->title,
-            'text'          => (string) $item->description,
+            'description'   => (string) $item->description,
+            'text'          => '',
             'link'          => (string) $item->link,
-            'user'          => ['id' => null, 'name' => null,],
+            'created_at'    => (string) $item->pubDate,
+            'user'          => [
+                'id' => null,
+                'name' => null,
+            ],
         ];
     }
 }

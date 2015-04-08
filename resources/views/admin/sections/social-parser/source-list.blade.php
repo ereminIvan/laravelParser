@@ -108,7 +108,7 @@
                                 <td>{{ $source->type }}</td>
                                 <td>{{ $source->uri }}</td>
                                 <td>{{ $source->keywords }}</td>
-                                <td>{{ $source->active }}</td>
+                                <td>{{ $source->is_active }}</td>
                                 <td>{{ $source->created_at }}</td>
                                 <td>{{ $source->executed_at }}</td>
                                 <td>{{ $source->user->name }}</td>

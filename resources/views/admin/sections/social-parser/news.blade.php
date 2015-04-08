@@ -19,12 +19,10 @@
             <dd>{{ $news->created_at }}</dd>
             <dt>Updated at</dt>
             <dd>{{ $news->updated_at }}</dd>
-            <dt>Updated at</dt>
-            <dd>{{ $news->updated_at }}</dd>
             <dt>Viewed at</dt>
-            <dd>{{ $news->updated_at }}</dd>
+            <dd>{{ $news->viewed_at }}</dd>
             <dt>Viewed by</dt>
-            <dd>{{ $news->user->name }}</dd>
+            <dd>@if($news->user){{ $news->user->name }}@endif</dd>
         </dl>
     @else
         News not found

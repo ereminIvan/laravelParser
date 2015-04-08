@@ -11,18 +11,20 @@ use Illuminate\Routing\Controller;
 
 use App\Models\ParserSource;
 use App\Models\ParserNews;
+use Illuminate\View\View;
 use League\Flysystem\Exception;
 use PhpParser\Parser;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SourceParserController extends AdminController
 {
     /**
-     * @var $layout \Illuminate\View\View
+     * @var $layout View
      */
     protected $layout = 'layouts.panel';
 
     /**
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function sourceList()
     {
@@ -44,7 +46,7 @@ class SourceParserController extends AdminController
                 'type'      => $request->input('sourceType'),
                 'uri'       => $request->input('sourceUri'),
                 'keywords'  => $request->input('sourceKeywords'),
-                'active'    => (int)(bool) $request->input('sourceActive'),
+                'is_active' => (int) (bool) $request->input('sourceActive'),
             ];
 
             if($id = $request->input('sourceId')) {
@@ -66,7 +68,7 @@ class SourceParserController extends AdminController
     }
 
     /**
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function newsList()
     {
@@ -76,14 +78,13 @@ class SourceParserController extends AdminController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\View\View
+     * @return View
+     * @param $id
      */
-    public function news(Request $request)
+    public function news($id)
     {
         return view('admin.sections.social-parser.news', [
-            'news'  => ParserNews::find($request->get('id', null))
+            'news'  => ParserNews::find($id)
         ]);
     }
 }

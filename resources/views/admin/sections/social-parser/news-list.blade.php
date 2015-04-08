@@ -18,27 +18,59 @@
                                 <th>Viewed</th>
                                 <th>Archived</th>
                                 <th>Dates</th>
-                                <th colspan="2">Author</th>
+                                <th colspan="2">User</th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach ($news as $topic)
                             <tr>
                                 <th scope="row">{{ $topic->id }}</th>
-                                <td>{{ $topic->title }}</td>
-                                <td>{{ $topic->description }}</td>
-                                <td>{{ $topic->uri }}</td>
-                                <td>{{ $topic->is_viewed }}</td>
-                                <td>{{ $topic->is_archived }}</td>
                                 <td>
-                                    <nobr>Created at: {{ $topic->created_at }}</nobr>
-                                    <nobr>Updated at: {{ $topic->updated_at }}</nobr>
-                                    <nobr>Viewed at: {{ $topic->viewed_at }}</nobr>
+                                    @if($topic->title)
+                                        {{ $topic->title }}
+                                    @else
+                                        <kbd>Empty</kbd>
+                                    @endif
                                 </td>
-                                <td>{{ $topic->user->name }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success btn-xs" data-toggle="modal"
-                                        data-target="#newsModal" data-news-id="{{ $topic->id }}">Read</button>
+                                    @if($topic->description)
+                                        {{ $topic->description }}
+                                    @else
+                                        <kbd>Empty</kbd>
+                                    @endif
+                                </td>
+                                <td>{{ $topic->uri }}</td>
+                                <td>
+                                    @if($topic->is_viewed)
+                                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($topic->is_archived)
+                                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <nobr><strong>Created at: </strong>
+                                    {{date("F j, Y, G:i:s",strtotime($topic->created_at))}}</nobr><br/>
+                                    <nobr><strong>Updated at: </strong>
+                                    {{date("F j, Y, G:i:s",strtotime($topic->updated_at))}}</nobr><br/>
+                                    <nobr><strong>Viewed at: </strong>
+                                    @if(!strtotime($topic->viewed_at))
+                                        {{date("F j, Y, G:i:s",strtotime($topic->viewed_at))}}
+                                    @else
+                                        <span>Not viewed</span>
+                                    @endif
+                                    </nobr>
+                                </td>
+                                <td>@if($topic->user)
+                                    {{ $topic->user->name }}
+                                    @else
+                                    <kbd>Not seen yet</kbd>
+                                    @endif</td>
+                                <td>
+                                    <a type="button" class="newsOpenButton btn btn-success btn-xs"
+                                        href="{{ route('parser-news-by-id', $topic->id) }}">Read</a>
                                 </td>
                             </tr>
                         @endforeach

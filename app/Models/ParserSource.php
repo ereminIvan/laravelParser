@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property          $type
  * @property          $uri
  * @property          $keywords
- * @property          $active
+ * @property          $is_active
  *
  * @property          $user_id
  *
@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 class ParserSource extends Model
 {
     protected $table = 'parser_sources';
-    protected $fillable = ['source', 'active', 'user_id', 'uri', 'keywords', 'type'];
+    protected $fillable = ['source', 'is_active', 'user_id', 'uri', 'keywords', 'type'];
     protected $guarded = ['id'];
 
     public function user()
