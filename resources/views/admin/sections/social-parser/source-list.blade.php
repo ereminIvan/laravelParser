@@ -1,7 +1,7 @@
 @extends('app')
 
 @section('content')
-<script src="{{ asset('/admin_panel/js/socialParser.js') }}"></script>
+<script src="{{ asset('/admin_panel/js/sourceParser.js') }}"></script>
 <div class="container">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">

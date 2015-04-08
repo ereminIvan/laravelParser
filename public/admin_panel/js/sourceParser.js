@@ -2,6 +2,7 @@
  * @author Eremin Ivan
  * @email coding.ebola@gmail.com
  */
+
 $(function() {
     $.ajaxSetup({
         headers: {
