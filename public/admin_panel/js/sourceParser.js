@@ -15,14 +15,34 @@ $(function() {
         });
         $.ajax({
             method: 'POST',
-            url: "/panel/social-parser/source",
+            url: "/panel/parser/source",
             data: data,
             complete : function(jqXHR, textStatus ) {
                 if(jqXHR.status == 422) {
                     console.log(jqXHR.responseJSON);
+                    //todo erros handler
                 }
                 if(jqXHR.status == 200) {
                     $('#sourceModal').modal('hide');
+                    document.location.reload();
+                }
+            }
+        });
+    });
+    $('#newsList .archive, #newsList .un-archive').click(function(){
+        var $item = $(this).closest('tr');
+        var data = {id : $(this).attr('data-news-id'), archive: $(this).attr('data-archive')};
+        $.ajax({
+            method: 'POST',
+            url: "/panel/parser/news/toggle-archive",
+            data: data,
+            complete : function(jqXHR, textStatus ) {
+                if(jqXHR.status == 422) {
+                    console.log(jqXHR.responseJSON);
+                    //todo erros handler
+                }
+                if(jqXHR.status == 200) {
+                    $item.remove();
                 }
             }
         });

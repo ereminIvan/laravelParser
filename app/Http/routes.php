@@ -18,10 +18,30 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
-Route::post('/panel/social-parser/source', ['before' => 'auth', 'uses' => 'Admin\SourceParserController@sourceAdd']);
-Route::get('/panel/social-parser/source', ['before' => 'auth', 'uses' => 'Admin\SourceParserController@sourceList']);
-Route::get('/panel/social-parser/news', ['before' => 'auth', 'uses' => 'Admin\SourceParserController@newsList']);
-Route::get('/panel/social-parser/news/{id}', [
+Route::post('/panel/parser/source', [
+    'before'    => 'auth',
+    'uses'      => 'Admin\SourceParserController@sourceAdd',
+    'as'        => 'parser-source-add',
+]);
+Route::get('/panel/parser/source', [
+    'before'    => 'auth',
+    'uses'      => 'Admin\SourceParserController@sourceList',
+    'as'        => 'parser-sources',
+]);
+Route::get('/panel/parser/news', [
+    'before'    => 'auth',
+    'uses'      => 'Admin\SourceParserController@newsList',
+    'as'        => 'parser-news'
+]);
+Route::get('/panel/parser/news-archive', [
+    'before'    => 'auth',
+    'uses'      => 'Admin\SourceParserController@newsArchiveList',
+    'as'        => 'parser-news-archive'
+]);
+Route::get('/panel/parser/news/{id}', [
     'before'    => 'auth',
     'as'        => 'parser-news-by-id',
-    'uses'      => 'Admin\SourceParserController@news']);
+    'uses'      => 'Admin\SourceParserController@news',
+]);
+Route::post('/panel/parser/news/toggle-archive', ['before' => 'auth',
+    'uses' => 'Admin\SourceParserController@newsToggleArchive']);

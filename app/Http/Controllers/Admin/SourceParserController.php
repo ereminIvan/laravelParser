@@ -24,6 +24,14 @@ class SourceParserController extends AdminController
     protected $layout = 'layouts.panel';
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->beforeFilter('auth');
+    }
+
+    /**
      * @return View
      */
     public function sourceList()
@@ -31,6 +39,10 @@ class SourceParserController extends AdminController
         return view('admin.sections.social-parser.source-list', ['sources' => ParserSource::all()]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
     public function sourceAdd(Request $request)
     {
         if($request->isMethod('POST') && $request->ajax()) {
@@ -73,18 +85,59 @@ class SourceParserController extends AdminController
     public function newsList()
     {
         return view('admin.sections.social-parser.news-list', [
-            'news' => ParserNews::all()
+            'news' => ParserNews::where('is_archived', 0)->get()
         ]);
     }
 
     /**
      * @return View
+     */
+    public function newsArchiveList()
+    {
+        return view('admin.sections.social-parser.news-list', [
+            'news' => ParserNews::where('is_archived', 1)->get()
+        ]);
+    }
+
+    /**
      * @param $id
+     *
+     * @return View
      */
     public function news($id)
     {
+        /** @var ParserNews $news */
+        $news = ParserNews::find($id);
+        if(!$news->user_id) {
+            $news->user_id = \Auth::user()->id;
+            $news->viewed_at = date('Y-m-d H:i:s');
+            $news->is_viewed = 1;
+            $news->save();
+        }
         return view('admin.sections.social-parser.news', [
             'news'  => ParserNews::find($id)
         ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function newsToggleArchive(Request $request)
+    {
+        if($request->isMethod('POST') && $request->ajax()) {
+            $this->validate($request, [
+                'id'        => 'integer',
+                'archive'   => 'in:1,0',
+            ]);
+            /** @var ParserNews $news */
+            $news = ParserNews::find(\Input::get('id'));
+            $news->is_archived = \Input::get('archive');
+            $news->save();
+            return response()->json([
+                'success'   => true,
+            ]);
+        }
+        return response();
     }
 }
