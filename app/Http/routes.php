@@ -18,7 +18,7 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
-Route::post('/panel/social-parser/source', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@sourceAdd']);
-Route::get('/panel/social-parser/source', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@sourceList']);
-Route::get('/panel/social-parser/news', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@newsList']);
-Route::get('/panel/social-parser/news/{id}', ['before' => 'auth', 'uses' => 'Admin\SocialParserController@news']);
+Route::post('/panel/social-parser/source', ['before' => 'auth', 'uses' => 'Admin\SourceParserController@sourceAdd']);
+Route::get('/panel/social-parser/source', ['before' => 'auth', 'uses' => 'Admin\SourceParserController@sourceList']);
+Route::get('/panel/social-parser/news', ['before' => 'auth', 'uses' => 'Admin\SourceParserController@newsList']);
+Route::get('/panel/social-parser/news/{id}', ['before' => 'auth', 'uses' => 'Admin\SourceParserController@news']);

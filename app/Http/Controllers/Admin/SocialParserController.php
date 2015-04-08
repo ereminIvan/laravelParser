@@ -14,7 +14,7 @@ use App\Models\ParserNews;
 use League\Flysystem\Exception;
 use PhpParser\Parser;
 
-class SocialParserController extends AdminController
+class SourceParserController extends AdminController
 {
     /**
      * @var $layout \Illuminate\View\View
