@@ -9,7 +9,6 @@ use App\Api\TwitterAPI;
 
 class TwitterParser extends Parser implements ParserInterface
 {
-    private $last_id;
     const REQUEST_LIMIT = 200;
 
     /**
@@ -30,26 +29,30 @@ class TwitterParser extends Parser implements ParserInterface
 
         $screenName = $this->extractScreenName($this->source->uri);
 
+        $requestParams = ['screen_name' => $screenName];
+
+        $lastId = null;
         $iteration = 0;
+
         do {
             ++$iteration;
-
-            $params = ['screen_name' => $screenName,];
-
-            if ($iteration > 1 && $this->last_id) {
-                $params = ['screen_name' => $screenName, 'max_id' => $this->last_id];
+            echo PHP_EOL. 'iteration: ' . $iteration . '  lastId : '. $lastId;
+            if ($iteration > 1 && $lastId) {
+                $requestParams['max_id'] = $lastId;
             }
-
-            list ($result, $failed) =
+            list ($result, $failed, $lastId) =
                 $this->processResult(
-                    $this->request($handler, $params),
+                    $this->request($handler, $requestParams),
                     $keywords,
                     $this->source->executed_at,
-                    $result
+                    $result,
+                    $lastId
                 );
         } while ($failed);
-        $this->last_id = null;
-        unset($iteration, $failed);
+
+        $lastId = null;
+
+        unset($iteration, $failed, $lastId);
 
         return $result;
     }
@@ -70,7 +73,7 @@ class TwitterParser extends Parser implements ParserInterface
      */
     public function request($handler, array $params)
     {
-        return $handler->statuses_userTimeline(array_merge($requestParams = [
+        return $handler->statuses_userTimeline(array_merge([
             'exclude_replies'   => 'true',  //may be turned off
             'include_rts'       => 'false', //may be turned off
             'count'             => self::REQUEST_LIMIT,
@@ -78,19 +81,21 @@ class TwitterParser extends Parser implements ParserInterface
     }
 
     /**
-     * @param \StdClass $items
-     * @param array $keywords
-     * @param string $time
-     * @param $result
+     * @param \StdClass $items      Current item of feed for check
+     * @param array     $keywords   Keywords for search
+     * @param string    $time       Time when last time task was executed
+     * @param array     $result     Result set
+     * @param string    $lastId     Last checked tweet id
      *
      * @return array
      */
-    public function processResult($items, $keywords, $time, &$result)
+    public function processResult($items, $keywords, $time, &$result, $lastId)
     {
         $statement = true;
         /** @var \StdClass $item */
         $iteration = 0;
         foreach ($items as $item) {
+            //If we reach after iterations request limit we out of result set: go out
             if(++$iteration == self::REQUEST_LIMIT) {
                 break;
             }
@@ -109,15 +114,18 @@ class TwitterParser extends Parser implements ParserInterface
                 $result[$item->id_str] = $this->normalize($item);
             }
 
-            $this->last_id = $item->id_str;
+            $lastId = $item->id_str;
         }
+
         unset($item, $iteration);
-        return [$result, $statement];
+
+        return [$result, $statement, $lastId];
     }
 
     /**
      * @param \StdClass $item
      * @param array     $keywords
+     *
      * @return bool
      */
     public function test($item, $keywords)
@@ -142,15 +150,15 @@ class TwitterParser extends Parser implements ParserInterface
     public function normalize($item)
     {
         return [
-            'id'            => (string) $item->id_str,
+            'id'            => $item->id_str,
             'title'         => '',
-            'description'   => (string) $item->text,
-            'text'          => (string) $item->text,
+            'description'   => $item->text,
+            'text'          => $item->text,
             'link'          => "https://twitter.com/{$item->user->id}/status/{$item->id_str}",
             'created_at'    => date('Y-m-d H:i:s', strtotime($item->created_at)),
             'user'          => [
-                'id'    => (string) $item->user->id,
-                'name'  => (string) $item->user->name
+                'id'        => $item->user->id,
+                'name'      => $item->user->name
             ],
         ];
     }
