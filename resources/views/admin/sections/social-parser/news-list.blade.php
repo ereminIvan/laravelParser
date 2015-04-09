@@ -26,7 +26,7 @@
                                 <th scope="row">{{ $topic->id }}</th>
                                 <td>@if($topic->title){{ $topic->title }}@else<kbd>NO</kbd>@endif</td>
                                 <td>@if($topic->description){{ $topic->description }}@else<kbd>NO</kbd>@endif</td>
-                                <td>{{ $topic->uri }}</td>
+                                <td><a href="{{ $topic->uri }}">LINK</a></td>
                                 <td>@if($topic->is_viewed)<kbd>YES</kbd>@else<kbd>NO</kbd>@endif</td>
                                 <td>
                                     <nobr><strong>Created at: </strong>

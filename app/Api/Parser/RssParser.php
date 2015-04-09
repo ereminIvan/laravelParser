@@ -81,7 +81,7 @@ class RssParser extends Parser implements ParserInterface
             'description'   => (string) $item->description,
             'text'          => (string) $item->description,
             'link'          => (string) $item->link,
-            'created_at'    => (string) $item->pubDate,
+            'created_at'    => (string) date('Y-m-d H:i:s', strtotime($item->pubDate)),
             'user'          => [
                 'id' => null,
                 'name' => null,
