@@ -34,7 +34,7 @@ class ParseSources extends Command {
         $this->comment(PHP_EOL . 'Collected list of sources:' . count($sources));
 
         foreach ($sources as $source) {
-            $this->comment("Source: {$source->type} | {$source->uri} | {$source->executed_at}");
+            $this->info("Source: {$source->type} | {$source->uri} | {$source->executed_at}");
 
             $items = ParserFactory::factory($source)->parse();
 

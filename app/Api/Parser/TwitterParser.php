@@ -31,28 +31,27 @@ class TwitterParser extends Parser implements ParserInterface
 
         $requestParams = ['screen_name' => $screenName];
 
-        $lastId = null;
+        $lastCheckedId = null;
         $iteration = 0;
 
         do {
             ++$iteration;
-            echo PHP_EOL. 'iteration: ' . $iteration . '  lastId : '. $lastId;
-            if ($iteration > 1 && $lastId) {
-                $requestParams['max_id'] = $lastId;
+            if ($iteration > 1 && $lastCheckedId) {
+                $requestParams['max_id'] = $lastCheckedId;
             }
-            list ($result, $failed, $lastId) =
+            list ($result, $failed, $lastCheckedId) =
                 $this->processResult(
                     $this->request($handler, $requestParams),
                     $keywords,
                     $this->source->executed_at,
                     $result,
-                    $lastId
+                    $lastCheckedId
                 );
         } while ($failed);
 
-        $lastId = null;
+        $lastCheckedId = null;
 
-        unset($iteration, $failed, $lastId);
+        unset($iteration, $failed, $lastCheckedId);
 
         return $result;
     }
@@ -81,15 +80,15 @@ class TwitterParser extends Parser implements ParserInterface
     }
 
     /**
-     * @param \StdClass $items      Current item of feed for check
-     * @param array     $keywords   Keywords for search
-     * @param string    $time       Time when last time task was executed
-     * @param array     $result     Result set
-     * @param string    $lastId     Last checked tweet id
+     * @param \StdClass $items          Current item of feed for check
+     * @param array     $keywords       Keywords for search
+     * @param string    $time           Time when last time task was executed
+     * @param array     $result         Result set
+     * @param string    $lastCheckedId  Last checked tweet id
      *
      * @return array
      */
-    public function processResult($items, $keywords, $time, &$result, $lastId)
+    public function processResult($items, $keywords, $time, &$result, $lastCheckedId)
     {
         $statement = true;
         /** @var \StdClass $item */
@@ -114,12 +113,12 @@ class TwitterParser extends Parser implements ParserInterface
                 $result[$item->id_str] = $this->normalize($item);
             }
 
-            $lastId = $item->id_str;
+            $lastCheckedId = $item->id_str;
         }
 
         unset($item, $iteration);
 
-        return [$result, $statement, $lastId];
+        return [$result, $statement, $lastCheckedId];
     }
 
     /**
