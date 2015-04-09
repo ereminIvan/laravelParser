@@ -100,7 +100,7 @@ class TwitterParser extends Parser implements ParserInterface
                 break;
             }
             //If tweet created time less then last scheduler execute time - it is old tweet: go out
-            if ((strtotime($item->created_at) - strtotime($time)) < 0) {
+            if (strtotime($item->created_at) < strtotime($time)) {
                 $statement = false;
                 break;
             }

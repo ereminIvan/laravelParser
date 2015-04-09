@@ -29,18 +29,18 @@ class ParseSources extends Command {
 	 */
 	public function handle()
 	{
-        $sources = ParserSource::query()
-            ->where('is_active', 1)
-            ->distinct()
-            ->get();
+        $sources = ParserSource::query()->where('is_active', 1)->distinct()->get();
 
         $this->comment(PHP_EOL . 'Collected list of sources:' . count($sources));
 
-        foreach($sources as $source) {
+        foreach ($sources as $source) {
             $this->comment("Source: {$source->type} | {$source->uri} | {$source->executed_at}");
+
             $items = ParserFactory::factory($source)->parse();
+
             $this->comment('Hits count: ' . count($items));
-            foreach($items as $item) {
+
+            foreach ($items as $item) {
                 //todo Check for unique | Unique buy source and keywords
                 ParserNews::create([
                     'title'             => $item['title'],
@@ -50,11 +50,9 @@ class ParseSources extends Command {
                     'source_created_at' => $item['created_at']
                 ]);
             }
-//            $source->executed_at = date('Y-m-d H:i:s');
+            $source->executed_at = date('Y-m-d H:i:s');
             $source->save();
         }
-        //todo Update all last source.executed_at date
-
 	}
 
 }

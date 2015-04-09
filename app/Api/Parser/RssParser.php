@@ -12,21 +12,43 @@ class RssParser extends Parser implements ParserInterface
     public function parse()
     {
         $source = RssAPI::get($this->source->uri);
-        $result = [];
-        $keywords = array_flip(explode(';', $this->source->keywords));
+
+        $keywords = array_flip(explode(';', mb_convert_case($this->source->keywords, MB_CASE_UPPER, "UTF-8")));
+
+        if(empty($keywords)) {
+            throw new \Exception('Keywords not passed');
+        }
+
         if ($source->attributes()->version == "2.0") {
-//Limits
-//            $items = !is_null($this->source->requestLimit)
-//                ? array_slice((array) $source->channel->item, 0, $this->source->requestLimit)
-//                : $source->channel->item;
-            foreach ($source->channel->item as $item) {
-                if ($this->test($item, $keywords)) {
-                    $result[] = $this->normalize($item);
-                }
+            if (isset($source->channel->item)) {
+                return $this->processResult($source->channel->item, $keywords, $this->source->executed_at);
             }
         } else {
             //todo implement other versions atom|rss1|rrs2
         }
+
+        return [];
+    }
+
+
+    /**
+     * @param $items
+     * @param $keywords
+     * @param $time
+     * @return array
+     */
+    public function processResult($items, $keywords, $time)
+    {
+        $result = [];
+        foreach ($items as $item) {
+            if (strtotime($item->pubDate) < strtotime($time)) {
+                continue;
+            }
+            if ($this->test($item, $keywords)) {
+                $result[] = $this->normalize($item);
+            }
+        }
+        unset($item);
         return $result;
     }
 
@@ -38,7 +60,7 @@ class RssParser extends Parser implements ParserInterface
     public function test($item, $keywords)
     {
         if ($text = $item->description) {
-            foreach (str_word_count($text, 2, self::CHAR_LIST) as $keyword) {
+            foreach (str_word_count(mb_convert_case($text, MB_CASE_UPPER, "UTF-8"), 2, self::CHAR_LIST) as $keyword) {
                 if (isset($keywords[$keyword])) {
                     return true;
                 }
@@ -57,7 +79,7 @@ class RssParser extends Parser implements ParserInterface
             'id'            => (string) $item->guid,
             'title'         => (string) $item->title,
             'description'   => (string) $item->description,
-            'text'          => '',
+            'text'          => (string) $item->description,
             'link'          => (string) $item->link,
             'created_at'    => (string) $item->pubDate,
             'user'          => [
