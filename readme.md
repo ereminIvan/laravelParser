@@ -8,4 +8,6 @@ $ mysql -uroot CREATE DATABASE `socialparser`CHARACTER SET utf8 COLLATE utf8_gen
 
 $ php composer.phar update
 
+$ php artisan migrate
+
 $ php artisan schedule:parse-sources
