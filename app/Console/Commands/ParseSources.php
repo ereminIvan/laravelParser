@@ -31,25 +31,26 @@ class ParseSources extends Command {
 	{
         $sources = ParserSource::query()
             ->where('is_active', 1)
-            ->where('executed_at', '<', date('Y-m-d H:i:s', strtotime('-1 day')))
             ->distinct()
             ->get();
 
-        $this->comment(PHP_EOL . 'Collected list of sources:' . count($sources) .  PHP_EOL);
+        $this->comment(PHP_EOL . 'Collected list of sources:' . count($sources));
 
-        $executionTime = date('Y-m-d H:i:s +3');
         foreach($sources as $source) {
-            foreach(ParserFactory::factory($source)->parse() as $item) {
+            $this->comment("Source: {$source->type} | {$source->uri} | {$source->executed_at}");
+            $items = ParserFactory::factory($source)->parse();
+            $this->comment('Hits count: ' . count($items));
+            foreach($items as $item) {
+                //todo Check for unique | Unique buy source and keywords
                 ParserNews::create([
-                    'title'         => $item['title'],
-                    'description'   => $item['description'],
-                    'text'          => $item['text'],
-                    'uri'           => $item['link'],
-                    'created_at'    => $item['created_at'],
-                    'executed_at'   => $executionTime,
+                    'title'             => $item['title'],
+                    'description'       => $item['description'],
+                    'text'              => $item['text'],
+                    'uri'               => $item['link'],
+                    'source_created_at' => $item['created_at']
                 ]);
             }
-            $source->executed_at = $executionTime;
+//            $source->executed_at = date('Y-m-d H:i:s');
             $source->save();
         }
         //todo Update all last source.executed_at date

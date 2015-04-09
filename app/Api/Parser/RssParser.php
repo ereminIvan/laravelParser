@@ -38,7 +38,7 @@ class RssParser extends Parser implements ParserInterface
     public function test($item, $keywords)
     {
         if ($text = $item->description) {
-            foreach (preg_split("/\s/i", $text) as $keyword) {
+            foreach (str_word_count($text, 2, self::CHAR_LIST) as $keyword) {
                 if (isset($keywords[$keyword])) {
                     return true;
                 }

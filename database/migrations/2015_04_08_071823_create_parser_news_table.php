@@ -24,6 +24,7 @@ class CreateParserNewsTable extends Migration {
             $table->tinyInteger('is_viewed', false, true)->default(0);
             $table->tinyInteger('is_archived', false, true)->default(0);
             $table->timestamp('viewed_at')->default(null);
+            $table->timestamp('source_created_at')->default(null);
             $table->timestamps();
             $table->integer('user_id')->unsigned()->default(null);
 //            $table->foreign('user_id')->references('id')->on('users');

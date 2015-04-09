@@ -52,6 +52,7 @@ class SourceParserController extends AdminController
                 'sourceUri'         => 'required',
                 'sourceKeywords'    => 'required',//|regex:/([\w\d\s\t]*);?/i',
                 'sourceActive'      => 'in:on,NULL',
+                'days'              => 'integer',
             ]);
 
             $data = [
@@ -67,8 +68,14 @@ class SourceParserController extends AdminController
                     $source->update($data);
                 };
             } else {
-                $data['user_id'] = \Auth::user()->id;
-                $source = ParserSource::create($data);
+                /*  backdoor for adjust last execution time,
+                    because we should not parsed posts from time begin,
+                    7 days is enough */
+                $days = \Input::get('days', 7);
+                $source =  new ParserSource($data);
+                $source->user_id = \Auth::user()->id;
+                $source->executed_at = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+                $source->save();
             }
 
             return response()->json([
