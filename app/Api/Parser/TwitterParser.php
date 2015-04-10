@@ -26,7 +26,7 @@ class TwitterParser extends Parser implements ParserInterface
         }
 
         $screenName = $this->extractScreenName($this->source->uri);
-        $keywords = $this->source->keywords;
+        $keywords = explode($this->source->keywords, ';');
         $requestParams = ['screen_name' => $screenName];
 
         $lastCheckedId = null;
