@@ -7,24 +7,25 @@ namespace App\Api\Parser;
 
 use App\Api\RssAPI;
 
-class RssParser extends Parser implements ParserInterface
+class RssParser extends Parser
 {
+    /**
+     * @return array
+     */
     public function parse()
     {
         $source = RssAPI::get($this->source->uri);
 
-        $keywords = explode($this->source->keywords, ';');
-
-        if(empty($keywords)) {
-            throw new \Exception('Keywords not passed');
-        }
-
         if ($source->attributes()->version == "2.0") {
             if (isset($source->channel->item)) {
-                return $this->processResult($source->channel->item, $keywords, $this->source->executed_at);
+                return $this->processResults(
+                    $source->channel->item,
+                    explode($this->source->keywords, ';'),
+                    $this->source->executed_at
+                );
             }
         } else {
-            //todo implement other versions atom|rss1|rrs2
+            //todo implement other versions atom|rss1
         }
 
         return [];
@@ -37,33 +38,19 @@ class RssParser extends Parser implements ParserInterface
      * @param $time
      * @return array
      */
-    protected function processResult($items, $keywords, $time)
+    protected function processResults($items, $keywords, $time)
     {
         $result = [];
         foreach ($items as $item) {
             if (strtotime($item->pubDate) < strtotime($time)) {
                 continue;
             }
-            if ($this->test($item, $keywords)) {
+            if ($this->test($item->description, $keywords)) {
                 $result[] = $this->normalize($item);
             }
         }
         unset($item);
         return $result;
-    }
-
-    /**
-     * @param $item
-     * @param array $keywords
-     * @return bool
-     */
-    public function test($item, $keywords)
-    {
-        if ($text = $item->description) {
-            preg_match('/(?:'.implode('|', $keywords).')/i', strip_tags($text), $matches);
-            return (bool)count($matches);
-        }
-        return false;
     }
 
     /**

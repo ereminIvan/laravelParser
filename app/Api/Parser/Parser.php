@@ -7,10 +7,10 @@ namespace App\Api\Parser;
 
 use App\Models\ParserSource;
 
-class Parser
+abstract class Parser implements ParserInterface
 {
     /** @var int */
-    protected $limit;
+    protected $limitPerRequests = 0;
 
     /** @var \App\Models\ParserSource */
     protected $source;
@@ -21,5 +21,17 @@ class Parser
     public function __construct(ParserSource $source)
     {
         $this->source = $source;
+    }
+
+    /**
+     * @param string $text
+     * @param array $keywords
+     *
+     * @return bool
+     */
+    public function test($text, array $keywords)
+    {
+        preg_match('/(?:'.implode('|', $keywords).')/i', strip_tags($text), $matches);
+        return (bool)count($matches);
     }
 }

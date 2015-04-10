@@ -8,9 +8,9 @@ namespace App\Api\Parser;
 use App\Api\FacebookAPI;
 use FaceBook\GraphObject;
 
-class FacebookParser extends Parser implements ParserInterface
+class FacebookParser extends Parser
 {
-    protected $limit = 100;
+    protected $limitPerRequests = 100;
 
     public function parse()
     {
@@ -35,12 +35,13 @@ class FacebookParser extends Parser implements ParserInterface
             unset($m);
         }
 
+        $query = "/{$uid}/posts?fields=id,message,link,created_time,name&limit={$this->limitPerRequests}";
         $keywords = explode($this->source->keywords, ';');
-        $iteration = 0;
-        $query = "/{$uid}/posts?fields=id,message,link,created_time,name&limit={$this->limit}";
+
+
         do {
             list ($result, $failed, $query) =
-                $this->processResult(
+                $this->processResults(
                     FacebookAPI::execute('GET', $query),
                     $keywords,
                     $this->source->executed_at,
@@ -48,7 +49,7 @@ class FacebookParser extends Parser implements ParserInterface
                 );
         } while ($failed);
 
-        unset($iteration, $failed, $query, $uid);
+        unset($failed, $query, $uid);
         return $result;
     }
 
@@ -60,10 +61,12 @@ class FacebookParser extends Parser implements ParserInterface
      *
      * @return array
      */
-    protected function processResult($items, $keywords, $time, &$result)
+    protected function processResults($items, $keywords, $time, &$result)
     {
         $statement = true;
         $iteration = 0;
+        $query = null;
+
         /** @var GraphObject $item */
         foreach ($items->getPropertyAsArray('data') as $item) {
             ++$iteration;
@@ -72,37 +75,22 @@ class FacebookParser extends Parser implements ParserInterface
                 $statement = false;
                 break;
             }
-            if ($this->test($item, $keywords)) {
+            if ($this->test($item->getProperty('message'), $keywords)) {
                 $result[$item->getProperty('id')] = $this->normalize($item);
             }
         }
 
-        if ($iteration == $this->limit) {
+        if ($iteration == $this->limitPerRequests) {
             $query = preg_replace(
                 '/^https:\/\/graph\.facebook\.com\/v\d\.\d/', '',
                 $items->getProperty('paging')->getProperty('next'));
-
         } else {
-            $query = null;
             $statement = false;
         }
+
         unset($item, $iteration);
 
         return [$result, $statement, $query];
-    }
-
-    /**
-     * @param GraphObject   $item
-     * @param array         $keywords
-     * @return bool
-     */
-    public function test($item, $keywords)
-    {
-        if ($text = $item->getProperty('message')) {
-            preg_match('/(?:'.implode('|', $keywords).')/i', strip_tags($text), $matches);
-            return (bool)count($matches);
-        }
-        return false;
     }
 
     /**

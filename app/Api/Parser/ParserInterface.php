@@ -5,7 +5,6 @@
  */
 namespace App\Api\Parser;
 
-
 interface ParserInterface
 {
     /**
@@ -13,16 +12,4 @@ interface ParserInterface
      */
     public function parse();
 
-    /**
-     * @param $item
-     * @param $keywords
-     * @return bool
-     */
-    public function test($item, $keywords);
-
-    /**
-     * @param $item
-     * @return array
-     */
-    public function normalize($item);
 }
