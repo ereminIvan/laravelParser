@@ -40,7 +40,6 @@ class FacebookAPI
         return $helper;
     }
 
-
     /**
      * @return FacebookSession
      */

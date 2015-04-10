@@ -13,7 +13,7 @@ class RssParser extends Parser implements ParserInterface
     {
         $source = RssAPI::get($this->source->uri);
 
-        $keywords = array_flip(explode(';', mb_convert_case($this->source->keywords, MB_CASE_UPPER, "UTF-8")));
+        $keywords = explode($this->source->keywords, ';');
 
         if(empty($keywords)) {
             throw new \Exception('Keywords not passed');
@@ -37,7 +37,7 @@ class RssParser extends Parser implements ParserInterface
      * @param $time
      * @return array
      */
-    public function processResult($items, $keywords, $time)
+    protected function processResult($items, $keywords, $time)
     {
         $result = [];
         foreach ($items as $item) {
@@ -54,17 +54,14 @@ class RssParser extends Parser implements ParserInterface
 
     /**
      * @param $item
-     * @param $keywords
+     * @param array $keywords
      * @return bool
      */
     public function test($item, $keywords)
     {
         if ($text = $item->description) {
-            foreach (str_word_count(mb_convert_case($text, MB_CASE_UPPER, "UTF-8"), 2, self::CHAR_LIST) as $keyword) {
-                if (isset($keywords[$keyword])) {
-                    return true;
-                }
-            }
+            preg_match('/(?:'.implode('|', $keywords).')/i', strip_tags($text), $matches);
+            return (bool)count($matches);
         }
         return false;
     }

@@ -9,7 +9,9 @@ use App\Models\ParserSource;
 
 class Parser
 {
-    const CHAR_LIST = 'АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя';
+    /** @var int */
+    protected $limit;
+
     /** @var \App\Models\ParserSource */
     protected $source;
 

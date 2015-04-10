@@ -9,7 +9,7 @@ use App\Api\TwitterAPI;
 
 class TwitterParser extends Parser implements ParserInterface
 {
-    const REQUEST_LIMIT = 200;
+    protected $limit = 200;
 
     /**
      * @return array
@@ -21,14 +21,12 @@ class TwitterParser extends Parser implements ParserInterface
         $handler = TwitterAPI::getCodeBird();
         $handler->setToken(TwitterAPI::ACCESS_TOKEN, TwitterAPI::ACCESS_SECRET);
 
-        $keywords = array_flip(explode(';', mb_convert_case($this->source->keywords, MB_CASE_UPPER, "UTF-8")));
-
-        if(empty($keywords)) {
+        if(empty($this->source->keywords)) {
            throw new \Exception('Keywords not passed');
         }
 
         $screenName = $this->extractScreenName($this->source->uri);
-
+        $keywords = $this->source->keywords;
         $requestParams = ['screen_name' => $screenName];
 
         $lastCheckedId = null;
@@ -48,8 +46,6 @@ class TwitterParser extends Parser implements ParserInterface
                     $lastCheckedId
                 );
         } while ($failed);
-
-        $lastCheckedId = null;
 
         unset($iteration, $failed, $lastCheckedId);
 
@@ -75,13 +71,13 @@ class TwitterParser extends Parser implements ParserInterface
         return $handler->statuses_userTimeline(array_merge([
             'exclude_replies'   => 'true',  //may be turned off
             'include_rts'       => 'false', //may be turned off
-            'count'             => self::REQUEST_LIMIT,
+            'count'             => $this->limit,
         ], $params));
     }
 
     /**
      * @param \StdClass $items          Current item of feed for check
-     * @param array     $keywords       Keywords for search
+     * @param string    $keywords       Keywords for search
      * @param string    $time           Time when last time task was executed
      * @param array     $result         Result set
      * @param string    $lastCheckedId  Last checked tweet id
@@ -95,7 +91,7 @@ class TwitterParser extends Parser implements ParserInterface
         $iteration = 0;
         foreach ($items as $item) {
             //If we reach after iterations request limit we out of result set: go out
-            if(++$iteration == self::REQUEST_LIMIT) {
+            if(++$iteration == $this->limit) {
                 break;
             }
             //If tweet has no date - it is not tweet: go out
@@ -129,15 +125,9 @@ class TwitterParser extends Parser implements ParserInterface
      */
     public function test($item, $keywords)
     {
-        if (!property_exists($item, 'text')) {
-            return false;
-        }
-        if ($text = $item->text) {
-            foreach (str_word_count(mb_convert_case($text, MB_CASE_UPPER, "UTF-8"), 2, self::CHAR_LIST) as $keyword) {
-                if (isset($keywords[$keyword])) {
-                    return true;
-                }
-            }
+        if (isset($item->text) && $item->text) {
+            preg_match('/(?:'.implode('|', $keywords).')/i', strip_tags($item->text), $matches);
+            return (bool)count($matches);
         }
         return false;
     }
