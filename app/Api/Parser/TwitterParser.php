@@ -36,7 +36,7 @@ class TwitterParser extends Parser
         $lastCheckedId = null;
         $iteration = 0;
         do {
-            echo PHP_EOL . 'Iteration: ' . $iteration . ' Last id: ' . $lastCheckedId;
+//            echo PHP_EOL . 'Iteration: ' . $iteration . ' Last id: ' . $lastCheckedId;
             ++$iteration;
             if ($iteration > 1) {
                 $requestParams['max_id'] = $lastCheckedId;
@@ -49,13 +49,17 @@ class TwitterParser extends Parser
             ], $requestParams));
 
             list ($result, $failed, $lastCheckedId) =
-                $this->processResults($items, $keywords, $this->source->executed_at, $result, $lastCheckedId);
-            var_dump([$failed, $lastCheckedId]);
+                $this->processResults(
+                    $items,
+                    $keywords,
+                    $this->source->executed_at,
+                    $result,
+                    $lastCheckedId
+                );
         } while ($failed);
 
         unset($iteration, $failed, $lastCheckedId);
 
-        die;
         return $result;
     }
 
@@ -80,17 +84,18 @@ class TwitterParser extends Parser
             if ($lastCheckedId == $item->id_str) {
                 continue;
             }
+
+            $lastCheckedId = $item->id_str;
+
             //If tweet created time less then last scheduler execute time - it is old tweet: go out
             if (strtotime($item->created_at) < strtotime($time)) {
+                $statement = false;
                 break;
             }
             if ($this->test($item->text, $keywords)) {
                 $result[$item->id_str] = $this->normalize($item);
             }
-
-            $lastCheckedId = $item->id_str;
         }
-
         unset($item);
 
         return [$result, $statement, $lastCheckedId];
