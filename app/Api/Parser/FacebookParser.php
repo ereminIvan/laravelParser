@@ -36,7 +36,7 @@ class FacebookParser extends Parser
         }
 
         $query = "/{$uid}/posts?fields=id,message,link,created_time,name&limit={$this->limitPerRequests}";
-        $keywords = explode($this->source->keywords, ';');
+        $keywords = explode(';', $this->source->keywords);
 
 
         do {

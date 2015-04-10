@@ -31,7 +31,7 @@ abstract class Parser implements ParserInterface
      */
     public function test($text, array $keywords)
     {
-        preg_match('/(?:'.implode('|', $keywords).')/i', strip_tags($text), $matches);
-        return (bool)count($matches);
+        preg_match('/(?:'.implode('|', $keywords).')/iu', strip_tags($text), $matches);
+        return (bool) count($matches);
     }
 }

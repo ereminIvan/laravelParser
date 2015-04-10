@@ -20,7 +20,7 @@ class RssParser extends Parser
             if (isset($source->channel->item)) {
                 return $this->processResults(
                     $source->channel->item,
-                    explode($this->source->keywords, ';'),
+                    explode(';', $this->source->keywords),
                     $this->source->executed_at
                 );
             }

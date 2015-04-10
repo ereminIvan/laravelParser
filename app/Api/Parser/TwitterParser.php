@@ -30,16 +30,15 @@ class TwitterParser extends Parser
         preg_match("/https?:\/\/(www\.)?twitter\.com\/(#!\/)?@?([^\/]*)/", $this->source->uri, $matches);
         $screenName = !empty($matches[3]) ? $matches[3] : $this->source->uri;
 
-
-        $keywords = explode($this->source->keywords, ';');
+        $keywords = explode(';', $this->source->keywords);
         $requestParams = ['screen_name' => $screenName];
 
         $lastCheckedId = null;
         $iteration = 0;
-
         do {
+            echo PHP_EOL . 'Iteration: ' . $iteration . ' Last id: ' . $lastCheckedId;
             ++$iteration;
-            if ($iteration > 1 && $lastCheckedId) {
+            if ($iteration > 1) {
                 $requestParams['max_id'] = $lastCheckedId;
             }
 
@@ -51,10 +50,12 @@ class TwitterParser extends Parser
 
             list ($result, $failed, $lastCheckedId) =
                 $this->processResults($items, $keywords, $this->source->executed_at, $result, $lastCheckedId);
+            var_dump([$failed, $lastCheckedId]);
         } while ($failed);
 
         unset($iteration, $failed, $lastCheckedId);
 
+        die;
         return $result;
     }
 
@@ -69,25 +70,20 @@ class TwitterParser extends Parser
      */
     public function processResults($items, $keywords, $time, &$result, $lastCheckedId)
     {
-        $statement = false;
-        $iteration = 0;
+        $statement = true;
 
         /** @var \StdClass $item */
         foreach ($items as $item) {
-            //If we reach after iterations request limit we out of result set: go out
-            if(++$iteration == $this->limitPerRequests) {
-                $statement = true;
+            if (!isset($item->id_str)) {
                 break;
             }
-            //If tweet has no date - it is not tweet: go out
-            if (empty($item->created_at) ) {
-                break;
+            if ($lastCheckedId == $item->id_str) {
+                continue;
             }
             //If tweet created time less then last scheduler execute time - it is old tweet: go out
             if (strtotime($item->created_at) < strtotime($time)) {
                 break;
             }
-
             if ($this->test($item->text, $keywords)) {
                 $result[$item->id_str] = $this->normalize($item);
             }
@@ -95,7 +91,7 @@ class TwitterParser extends Parser
             $lastCheckedId = $item->id_str;
         }
 
-        unset($item, $iteration);
+        unset($item);
 
         return [$result, $statement, $lastCheckedId];
     }
