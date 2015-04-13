@@ -26,8 +26,10 @@ class CreateParserNewsTable extends Migration {
             $table->timestamp('viewed_at')->default(null);
             $table->timestamp('source_created_at')->default(null);
             $table->timestamps();
+			$table->integer('parser_source_id')->unsigned();
+			$table->foreign('parser_source_id')->references('id')->on('parser_sources');
             $table->integer('user_id')->unsigned()->default(null);
-//            $table->foreign('user_id')->references('id')->on('users');
+//            $table->foreign('user_id')->references('id')->on('lara_users');
 		});
 	}
 

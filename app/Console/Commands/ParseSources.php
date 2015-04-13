@@ -40,7 +40,8 @@ class ParseSources extends Command {
                     $source->type,
                     $source->uri,
                     explode(';', $source->keywords),
-                    $source->executed_at
+                    $source->executed_at,
+					$source->created_at
                 )->parse();
 
                 $this->comment('Hits count: ' . count($items));
@@ -52,7 +53,8 @@ class ParseSources extends Command {
                         'description' => $item['description'],
                         'text' => $item['text'],
                         'uri' => $item['link'],
-                        'source_created_at' => $item['created_at']
+                        'source_created_at' => $item['created_at'],
+						'parser_source_id'  => $source->id
                     ]);
                 }
                 $source->executed_at = date('Y-m-d H:i:s');
