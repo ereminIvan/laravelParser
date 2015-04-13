@@ -97,7 +97,7 @@ class FacebookParser extends Parser
      * @param  GraphObject $item
      * @return array
      */
-    public function normalize($item)
+    protected function normalize($item)
     {
         $message = $item->getProperty('message') ? : '';
 

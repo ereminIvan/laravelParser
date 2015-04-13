@@ -34,7 +34,7 @@ abstract class Parser
      *
      * @return bool
      */
-    public function test($text, array $keywords)
+    protected function test($text, array $keywords)
     {
         preg_match('/(?:'.implode('|', $keywords).')/iu', strip_tags($text), $matches);
         return (bool) count($matches);
