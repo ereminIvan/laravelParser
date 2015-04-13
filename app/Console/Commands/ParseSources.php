@@ -28,36 +28,39 @@ class ParseSources extends Command {
 	 * @return mixed
 	 */
 	public function handle()
-	{
+    {
         $sources = ParserSource::query()->where('is_active', 1)->distinct()->get();
 
         $this->comment(PHP_EOL . 'Collected list of sources:' . count($sources));
+        try {
+            foreach ($sources as $source) {
+                $this->info("Source: {$source->type} | {$source->uri} | {$source->executed_at}");
 
-        foreach ($sources as $source) {
-            $this->info("Source: {$source->type} | {$source->uri} | {$source->executed_at}");
+                $items = ParserFactory::factory(
+                    $source->type,
+                    $source->uri,
+                    explode(';', $source->keywords),
+                    $source->executed_at
+                )->parse();
 
-            $items = ParserFactory::factory(
-                $source->type,
-                $source->uri,
-                explode(';', $source->keywords),
-                $source->executed_at
-            )->parse();
+                $this->comment('Hits count: ' . count($items));
 
-            $this->comment('Hits count: ' . count($items));
-
-            foreach ($items as $item) {
-                //todo Check for unique | Unique buy source and keywords
-                ParserNews::create([
-                    'title'             => $item['title'],
-                    'description'       => $item['description'],
-                    'text'              => $item['text'],
-                    'uri'               => $item['link'],
-                    'source_created_at' => $item['created_at']
-                ]);
+                foreach ($items as $item) {
+                    //todo Check for unique | Unique buy source and keywords
+                    ParserNews::create([
+                        'title' => $item['title'],
+                        'description' => $item['description'],
+                        'text' => $item['text'],
+                        'uri' => $item['link'],
+                        'source_created_at' => $item['created_at']
+                    ]);
+                }
+                $source->executed_at = date('Y-m-d H:i:s');
+                $source->save();
             }
-            $source->executed_at = date('Y-m-d H:i:s');
-            $source->save();
+        } catch (\Exception $e) {
+            $this->error(PHP_EOL . "ERROR[{$e->getCode()}]: {$e->getMessage()}");
         }
-	}
+    }
 
 }

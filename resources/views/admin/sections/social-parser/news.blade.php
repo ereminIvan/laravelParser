@@ -21,6 +21,8 @@
 <!--            <dd>{{ $news->updated_at }}</dd>-->
             <dt>Viewed at</dt>
             <dd>{{ $news->viewed_at }}</dd>
+            <dt>Source Created at</dt>
+            <dd>{{ $news->source_created_at }}</dd>
             <dt>Viewed by</dt>
             <dd>@if($news->user){{ $news->user->name }}@endif</dd>
         </dl>
