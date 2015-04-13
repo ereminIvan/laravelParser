@@ -7,7 +7,7 @@ namespace App\Api\Parser;
 
 use App\Models\ParserSource;
 
-abstract class Parser implements ParserInterface
+abstract class Parser
 {
     /** @var int */
     protected $limitPerRequests = 0;
@@ -22,6 +22,11 @@ abstract class Parser implements ParserInterface
     {
         $this->source = $source;
     }
+
+    /**
+     * @return array
+     */
+    public abstract function parse();
 
     /**
      * @param string $text
