@@ -37,7 +37,9 @@ class FacebookParser extends Parser
 
         $query = "/{$uid}/posts?fields=id,message,link,created_time,name&limit={$this->limitPerRequests}";
 
+//        $iteration = 0;
         do {
+//            echo PHP_EOL . 'Iteration: ' . ++$iteration . ' | Count: ' . count($result);
             list ($result, $failed, $query) = $this->processResults(FacebookAPI::execute('GET', $query), $result);
         } while ($failed);
 
@@ -97,7 +99,7 @@ class FacebookParser extends Parser
             'title'         => $item->getProperty('name') ? : '',
             'description'   => substr($message, 0, 200),
             'text'          => $message,
-            'link'          => $item->getProperty('link'),
+            'link'          => $item->getProperty('link') ? : '',
             'created_at'    => date('Y-m-d H:i:s', strtotime($item->getProperty('created_time'))), //or updated_time?
             'user'          => [
                 'id'    => null,
