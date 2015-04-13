@@ -19,15 +19,15 @@ class FacebookParser extends Parser
         FacebookAPI::init();
 
         //Request explanation of page
-        $sourceGraph = FacebookAPI::execute('GET', "?ids=" . urlencode($this->source->uri))
-            ->getProperty($this->source->uri);
+        $sourceGraph = FacebookAPI::execute('GET', "?ids=" . urlencode($this->sourceURI))
+            ->getProperty($this->sourceURI);
 
         if ($sourceGraph->getProperty('category')) {
             $uid = $sourceGraph->getProperty('id');
         } elseif ($sourceGraph->getProperty('og_object')) {
             $uid = $sourceGraph->getProperty('og_object')->getProperty('id');
         } else {
-            preg_match('/\d+$|[\w\.]+$/i', $this->source->uri, $m);
+            preg_match('/\d+$|[\w\.]+$/i', $this->sourceURI, $m);
             if (!isset($m[0])) {
                 throw new \Exception('Undetectable page id', 404);
             }
@@ -36,17 +36,9 @@ class FacebookParser extends Parser
         }
 
         $query = "/{$uid}/posts?fields=id,message,link,created_time,name&limit={$this->limitPerRequests}";
-        $keywords = explode(';', $this->source->keywords);
-
 
         do {
-            list ($result, $failed, $query) =
-                $this->processResults(
-                    FacebookAPI::execute('GET', $query),
-                    $keywords,
-                    $this->source->executed_at,
-                    $result
-                );
+            list ($result, $failed, $query) = $this->processResults(FacebookAPI::execute('GET', $query), $result);
         } while ($failed);
 
         unset($failed, $query, $uid);
@@ -55,13 +47,12 @@ class FacebookParser extends Parser
 
     /**
      * @param GraphObject   $items
-     * @param string        $keywords
-     * @param string        $time
+     *
      * @param $result       $array
      *
      * @return array
      */
-    protected function processResults($items, $keywords, $time, &$result)
+    protected function processResults($items, &$result)
     {
         $statement = true;
         $iteration = 0;
@@ -71,11 +62,11 @@ class FacebookParser extends Parser
         foreach ($items->getPropertyAsArray('data') as $item) {
             ++$iteration;
             //If tweet created time less then last scheduler execute time - it is old tweet: go out
-            if (strtotime($item->getProperty('created_time')) < strtotime($time)) {
+            if (strtotime($item->getProperty('created_time')) < strtotime($this->executedAt)) {
                 $statement = false;
                 break;
             }
-            if ($this->test($item->getProperty('message'), $keywords)) {
+            if ($this->test($item->getProperty('message'), $this->keywords)) {
                 $result[$item->getProperty('id')] = $this->normalize($item);
             }
         }

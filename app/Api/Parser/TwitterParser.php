@@ -22,16 +22,12 @@ class TwitterParser extends Parser
         $handler = TwitterAPI::getCodeBird();
         $handler->setToken(TwitterAPI::ACCESS_TOKEN, TwitterAPI::ACCESS_SECRET);
 
-        if(empty($this->source->keywords)) {
-            throw new \Exception('Keywords not passed');
-        }
-
         //Extract ScreenName
-        preg_match("/https?:\/\/(www\.)?twitter\.com\/(#!\/)?@?([^\/]*)/", $this->source->uri, $matches);
-        $screenName = !empty($matches[3]) ? $matches[3] : $this->source->uri;
+        preg_match("/https?:\/\/(www\.)?twitter\.com\/(#!\/)?@?([^\/]*)/", $this->sourceURI, $matches);
 
-        $keywords = explode(';', $this->source->keywords);
-        $requestParams = ['screen_name' => $screenName];
+        $requestParams = [
+            'screen_name' => !empty($matches[3]) ? $matches[3] : $this->sourceURI,
+        ];
 
         $lastCheckedId = null;
         $iteration = 0;
@@ -51,8 +47,6 @@ class TwitterParser extends Parser
             list ($result, $failed, $lastCheckedId) =
                 $this->processResults(
                     $items,
-                    $keywords,
-                    $this->source->executed_at,
                     $result,
                     $lastCheckedId
                 );
@@ -65,14 +59,12 @@ class TwitterParser extends Parser
 
     /**
      * @param \StdClass $items          Current item of feed for check
-     * @param string    $keywords       Keywords for search
-     * @param string    $time           Time when last time task was executed
      * @param array     $result         Result set
      * @param string    $lastCheckedId  Last checked tweet id
      *
      * @return array
      */
-    public function processResults($items, $keywords, $time, &$result, $lastCheckedId)
+    public function processResults($items, &$result, $lastCheckedId)
     {
         $statement = true;
 
@@ -88,11 +80,12 @@ class TwitterParser extends Parser
             $lastCheckedId = $item->id_str;
 
             //If tweet created time less then last scheduler execute time - it is old tweet: go out
-            if (strtotime($item->created_at) < strtotime($time)) {
+            if (strtotime($item->created_at) < strtotime($this->executedAt)) {
                 $statement = false;
                 break;
             }
-            if ($this->test($item->text, $keywords)) {
+
+            if ($this->test($item->text, $this->executedAt)) {
                 $result[$item->id_str] = $this->normalize($item);
             }
         }

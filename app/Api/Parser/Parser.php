@@ -7,20 +7,27 @@ namespace App\Api\Parser;
 
 use App\Models\ParserSource;
 
+/**
+ * @property int    limitPerRequests
+ * @property array  keywords
+ * @property string sourceURI
+ */
 abstract class Parser
 {
-    /** @var int */
     protected $limitPerRequests = 0;
-
-    /** @var \App\Models\ParserSource */
-    protected $source;
+    protected $sourceURI;
+    protected $keywords = [];
 
     /**
-     * @param \App\Models\ParserSource $source
+     * @param string    $sourceURI
+     * @param array     $keywords
+     * @param string    $executedAt
      */
-    public function __construct(ParserSource $source)
+    public function __construct($sourceURI, array $keywords, $executedAt)
     {
-        $this->source = $source;
+        $this->sourceURI = $sourceURI;
+        $this->keywords  = $keywords;
+        $this->executedAt = $executedAt;
     }
 
     /**
@@ -30,13 +37,12 @@ abstract class Parser
 
     /**
      * @param string $text
-     * @param array $keywords
      *
      * @return bool
      */
-    protected function test($text, array $keywords)
+    protected function test($text)
     {
-        preg_match('/(?:'.implode('|', $keywords).')/iu', strip_tags($text), $matches);
+        preg_match('/(?:'.implode('|', $this->keywords).')/iu', strip_tags($text), $matches);
         return (bool) count($matches);
     }
 }

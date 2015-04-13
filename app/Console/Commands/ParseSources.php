@@ -36,7 +36,12 @@ class ParseSources extends Command {
         foreach ($sources as $source) {
             $this->info("Source: {$source->type} | {$source->uri} | {$source->executed_at}");
 
-            $items = ParserFactory::factory($source)->parse();
+            $items = ParserFactory::factory(
+                $source->type,
+                $source->uri,
+                explode(';', $source->keywords),
+                $source->executed_at
+            )->parse();
 
             $this->comment('Hits count: ' . count($items));
 

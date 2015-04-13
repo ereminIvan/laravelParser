@@ -14,15 +14,11 @@ class RssParser extends Parser
      */
     public function parse()
     {
-        $source = RssAPI::get($this->source->uri);
+        $source = RssAPI::get($this->sourceURI);
 
         if ($source->attributes()->version == "2.0") {
             if (isset($source->channel->item)) {
-                return $this->processResults(
-                    $source->channel->item,
-                    explode(';', $this->source->keywords),
-                    $this->source->executed_at
-                );
+                return $this->processResults($source->channel->item);
             }
         } else {
             //todo implement other versions atom|rss1
@@ -34,18 +30,17 @@ class RssParser extends Parser
 
     /**
      * @param $items
-     * @param $keywords
-     * @param $time
+     *
      * @return array
      */
-    protected function processResults($items, $keywords, $time)
+    protected function processResults($items)
     {
         $result = [];
         foreach ($items as $item) {
-            if (strtotime($item->pubDate) < strtotime($time)) {
+            if (strtotime($item->pubDate) < strtotime($this->executedAt)) {
                 continue;
             }
-            if ($this->test($item->description, $keywords)) {
+            if ($this->test($item->description, $this->keywords)) {
                 $result[] = $this->normalize($item);
             }
         }

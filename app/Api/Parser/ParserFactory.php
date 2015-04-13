@@ -10,12 +10,16 @@ use App\Models\ParserSource;
 class ParserFactory
 {
     /**
-     * @param ParserSource $source
-     * @return Parser|ParserInterface
+     * @param string $sourceType
+     * @param string $sourceURI
+     * @param array  $keywords
+     * @param string $executedAt
+     *
+     * @return Parser
      */
-    public static function factory(ParserSource $source)
+    public static function factory($sourceType, $sourceURI, array $keywords, $executedAt)
     {
-        return (new \ReflectionClass('\App\Api\Parser\\' . ucfirst($source->type) . 'Parser'))
-            ->newInstanceArgs([$source]);
+        return (new \ReflectionClass('\App\Api\Parser\\' . ucfirst($sourceType) . 'Parser'))
+            ->newInstanceArgs([$sourceURI, $keywords, $executedAt]);
     }
 } 
