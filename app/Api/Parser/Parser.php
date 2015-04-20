@@ -11,12 +11,15 @@ use App\Models\ParserSource;
  * @property int    limitPerRequests
  * @property array  keywords
  * @property string sourceURI
+ * @property string executedAt
  */
 abstract class Parser
 {
     protected $limitPerRequests = 0;
     protected $sourceURI;
     protected $keywords = [];
+    protected $executedAt;
+
 	/**
 	 * If false then parse outdated news in first start
 	 * @var bool
@@ -27,25 +30,12 @@ abstract class Parser
      * @param string    $sourceURI
      * @param array     $keywords
      * @param string    $executedAt
-	 * @param string    $createdAt
      */
-    public function __construct($sourceURI, array $keywords, $executedAt, $createdAt)
+    public function __construct($sourceURI, array $keywords, $executedAt)
     {
-		foreach ($keywords as $key => $keyword) {
-			$keywords[$key] = trim($keyword);
-			if (empty($keywords[$key])) {
-				unset($keywords[$key]);
-			}
-		}
-
         $this->sourceURI = $sourceURI;
         $this->keywords  = $keywords;
         $this->executedAt = $executedAt;
-		$this->createdAt = $createdAt;
-
-		if ($this->firstTimeDateLimit && strtotime($this->executedAt) < 0) {
-			$this->executedAt = $this->createdAt;
-		}
     }
 
     /**
@@ -60,7 +50,7 @@ abstract class Parser
      */
     protected function test($text)
     {
-        preg_match('/(?:'.implode('|', $this->keywords).')/iu', strip_tags($text), $matches);
+        preg_match('/(?:' . implode('|', $this->keywords) . ')/iu', strip_tags($text), $matches);
         return (bool) count($matches);
     }
 }

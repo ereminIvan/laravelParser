@@ -8,6 +8,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading panel-error">List of parsed news</div>
                 <div class="panel-body">
+                    {!! $news->render() !!}
                     <table id="newsList" class="table">
                         <thead>
                             <tr>
@@ -61,6 +62,7 @@
                         @endforeach
                         </tbody>
                     </table>
+                    {!! $news->render() !!}
                 </div>
             </div>
         </div>

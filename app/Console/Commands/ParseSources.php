@@ -5,6 +5,7 @@ use App\Models\ParserSource;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Inspiring;
 use App\Api\Parser\ParserFactory;
+use Symfony\Component\Console\Input\InputOption;
 
 class ParseSources extends Command {
 
@@ -22,6 +23,19 @@ class ParseSources extends Command {
 	 */
 	protected $description = 'Parse all available ParserSource for News';
 
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['byCreatedAt', null, InputOption::VALUE_NONE, 'If passed then parse outdated news in first start']
+        ];
+    }
+
 	/**
 	 * Execute the console command.
 	 *
@@ -31,28 +45,39 @@ class ParseSources extends Command {
     {
         $sources = ParserSource::query()->where('is_active', 1)->distinct()->get();
 
-        $this->comment(PHP_EOL . 'Collected list of sources:' . count($sources));
+        $this->info(PHP_EOL . 'Collected list of sources: ' . count($sources));
+
         try {
             foreach ($sources as $source) {
-                $this->info("Source: {$source->type} | {$source->uri} | {$source->executed_at}");
+                $this->comment("Source: {$source->type} | {$source->uri} | {$source->executed_at}");
 
+                //keywords
+                $keywords = [];
+                foreach (explode(';', $source->keywords) as $key => $keyword) {
+                    $keywords[$key] = trim($keyword);
+                    if (empty($keywords[$key])) {
+                        unset($keywords[$key]);
+                    }
+                }
+
+                //Parse Items
                 $items = ParserFactory::factory(
                     $source->type,
                     $source->uri,
-                    explode(';', $source->keywords),
-                    $source->executed_at,
-					$source->created_at
+                    $keywords,
+                    $this->option('byCreatedAt') ? $source->created_at : $source->executed_at
                 )->parse();
 
                 $this->comment('Hits count: ' . count($items));
 
+                //Saving Items
                 foreach ($items as $item) {
                     //todo Check for unique | Unique buy source and keywords
                     ParserNews::create([
-                        'title' => $item['title'],
-                        'description' => $item['description'],
-                        'text' => $item['text'],
-                        'uri' => $item['link'],
+                        'title'             => $item['title'],
+                        'description'       => $item['description'],
+                        'text'              => $item['text'],
+                        'uri'               => $item['link'],
                         'source_created_at' => $item['created_at'],
 						'parser_source_id'  => $source->id
                     ]);

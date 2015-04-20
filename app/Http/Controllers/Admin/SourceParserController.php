@@ -71,10 +71,10 @@ class SourceParserController extends AdminController
                 /*  backdoor for adjust last execution time,
                     because we should not parsed posts from time begin,
                     7 days is enough */
-                $days = \Input::get('days', 7);
                 $source =  new ParserSource($data);
                 $source->user_id = \Auth::user()->id;
-                $source->executed_at = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+//                $days = \Input::get('days', 7);
+//                $source->executed_at = date('Y-m-d H:i:s', strtotime("-{$days} days"));
                 $source->save();
             }
 
@@ -92,7 +92,7 @@ class SourceParserController extends AdminController
     public function newsList()
     {
         return view('admin.sections.social-parser.news-list', [
-            'news' => ParserNews::where('is_archived', 0)->get()
+            'news' => ParserNews::where('is_archived', 0)->paginate(20)
         ]);
     }
 
@@ -102,7 +102,7 @@ class SourceParserController extends AdminController
     public function newsArchiveList()
     {
         return view('admin.sections.social-parser.news-list', [
-            'news' => ParserNews::where('is_archived', 1)->get()
+            'news' => ParserNews::where('is_archived', 1)->paginate(20)
         ]);
     }
 

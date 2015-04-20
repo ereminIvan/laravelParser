@@ -14,13 +14,12 @@ class ParserFactory
      * @param string $sourceURI
      * @param array  $keywords
      * @param string $executedAt
-	 * @param string $createdAt
      *
      * @return Parser
      */
-    public static function factory($sourceType, $sourceURI, array $keywords, $executedAt, $createdAt)
+    public static function factory($sourceType, $sourceURI, array $keywords, $executedAt)
     {
         return (new \ReflectionClass('\App\Api\Parser\\' . ucfirst($sourceType) . 'Parser'))
-            ->newInstanceArgs([$sourceURI, $keywords, $executedAt, $createdAt]);
+            ->newInstanceArgs([$sourceURI, $keywords, $executedAt]);
     }
 } 

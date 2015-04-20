@@ -29,7 +29,8 @@ class ParserNews extends Model
 {
     protected $table = 'parser_news';
     protected $fillable = [
-        'title', 'description', 'text', 'uri', 'is_viewed', 'is_archived', 'viewed_at', 'source_created_at'
+        'title', 'description', 'text', 'uri', 'is_viewed', 'is_archived', 'viewed_at',
+        'source_created_at', 'parser_source_id',
     ];
     protected $guarded = ['id'];
 
